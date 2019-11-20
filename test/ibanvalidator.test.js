@@ -92,4 +92,25 @@ describe('When coarse format checking', () => {
 
   })
 
+  describe('length', () => {
+
+    it.skip("should reject IBANs that have more than 34 characters", () => {
+      const ibanUnderTest = "DE345678901234567890123456789012345"
+    })
+
+    it.skip("should reject IBANs that have more than 34 characters", () => {
+      const DE_ibanUnderTest = "DE345678901234567890123"
+      const BE_ibanUnderTest = "BE345678901234567"
+      const MT_ibanUnderTest = "MT345678901234567890123456789012"
+    })
+
+    it.skip("should reject IBANs that have more than 34 characters", () => {
+      // DE = 22, BE = 16, MT = 31,
+      const DE_ibanUnderTest = "DE34567890123456789012"
+      const BE_ibanUnderTest = "BE34567890123456"
+      const MT_ibanUnderTest = "MT34567890123456789012345678901"
+    })
+
+  })
+
 })
