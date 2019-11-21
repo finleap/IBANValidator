@@ -68,6 +68,35 @@ const countries = { "AL" : 28,
                     "GB" : 22,
                     "VG" : 24 }
 
+const letters = {
+                  "A": 10,
+                  "B": 11,
+                  "C": 12,
+                  "D": 13,
+                  "E": 14,
+                  "F": 15,
+                  "G": 16,
+                  "H": 17,
+                  "I": 18,
+                  "J": 19,
+                  "K": 20,
+                  "L": 21,
+                  "M": 22,
+                  "N": 23,
+                  "O": 24,
+                  "P": 25,
+                  "Q": 26,
+                  "R": 27,
+                  "S": 28,
+                  "T": 29,
+                  "U": 30,
+                  "V": 31,
+                  "W": 32,
+                  "X": 33,
+                  "Y": 34,
+                  "Z": 35
+                }
+
 const cleanIban = (iban) => {
   return iban.replace(/(\s|-)/g, '')
 }
@@ -90,4 +119,102 @@ const checkCountryCode = (iban) => {
   return startChars in countries
 }
 
-module.exports = { cleanIban, checkInvalidChars, checkStartOfIBAN, checkCountryCode }
+const rearrange = (iban) => {
+
+    let startIndex = iban.startIndex
+
+    // Get first 4 chars
+    const firstFourChars = iban.substring(0, 4)
+
+    // Discard chars 3,4 (old checksum)
+    const firstTwoChars = firstFourChars.substring(0, 2)
+
+    // Get remaining chars
+    const remainingChars = iban.substring(4)
+
+    return remainingChars + firstTwoChars + "00"
+
+}
+
+const replaceAlphaChars = (iban) => {
+
+  const ibanArray = iban.split("")
+  const codedIbanArray = new Array()
+
+  ibanArray.forEach( element => {
+
+    const regex = RegExp('[0-9]')
+    var value = ""
+
+    if (!regex.test(element) ) {
+      // Find key for element value
+      value = letters[element]
+    } else {
+      value = element
+    }
+
+    // replace element with the key
+    codedIbanArray.push(value)
+
+  })
+
+  var codedIban = ""
+
+  codedIbanArray.forEach( element => {
+    codedIban = codedIban + element.toString()
+  })
+
+  return codedIban
+
+}
+
+const calculateChecksum = (iban) => {
+
+    const ibanNumber = BigInt(iban)
+
+    const modulus = ibanNumber % BigInt(97)
+
+    const checksumInt = BigInt(98) - modulus
+
+    if (checksumInt < 10) {
+      return `0${checksumInt}`
+    }
+
+    return checksumInt.toString()
+
+}
+
+const checkLength = (iban) => {
+
+  // ANY IBAN longer than 34 should be rejected
+  if (iban.length > 34) {
+    throw new Error('invalidLength')
+  }
+
+  // Split country characters
+  const startChars = iban.substring(0,2).toLocaleUpperCase()
+
+  // Get corresponding length
+  const validIbanLength = countries[startChars]
+
+  if (validIbanLength) {
+
+    if (iban.length == validIbanLength) {
+
+      return true
+
+    } else {
+
+      throw new Error('invalidLength')
+      
+    }
+
+  } else {
+
+    throw new Error('invalidCountryCode')
+
+  }
+
+}
+
+module.exports = { cleanIban, checkInvalidChars, checkStartOfIBAN, checkCountryCode, rearrange, replaceAlphaChars, calculateChecksum, checkLength }
